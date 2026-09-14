@@ -1,0 +1,9 @@
+{
+  "name": "web_profile",
+  "version": "1.0.0",
+  "private": true,
+"scripts": {
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "cd frontend && flutter run -d chrome --web-port 8080"
+  }
+}
