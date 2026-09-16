@@ -7,6 +7,7 @@ class PortfolioModel {
   final String? deviceFrameUrl;
   final String? deviceType;
   final String? liveUrl;
+  final String? liveUrlLabel;
   final String? githubUrl;
   final bool featured;
 
@@ -21,6 +22,7 @@ class PortfolioModel {
     this.liveUrl,
     this.githubUrl,
     this.featured = false,
+    this.liveUrlLabel,
   });
 
   factory PortfolioModel.fromJson(Map<String, dynamic> json) {
@@ -33,6 +35,7 @@ class PortfolioModel {
       deviceFrameUrl: json['deviceFrameUrl'] as String?,
       deviceType: json['deviceType'] as String?,
       liveUrl: json['liveUrl'] as String?,
+      liveUrlLabel: json['liveUrlLabel'] as String?,
       githubUrl: json['githubUrl'] as String?,
       featured: json['featured'] as bool? ?? false,
     );

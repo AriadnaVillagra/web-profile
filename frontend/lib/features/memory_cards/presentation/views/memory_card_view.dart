@@ -125,7 +125,6 @@ class _MemoryCardViewState extends State<MemoryCardView> {
   Widget build(BuildContext context) {
     final bool isWon = _state.isWon;
     final bool isGameOver = _state.isGameOver;
-
     // Cambiar dinámicamente el mensaje del gato según el estado del juego
     String catText = _dialogues[_dialogueIndex];
     if (isWon) {
@@ -135,11 +134,11 @@ class _MemoryCardViewState extends State<MemoryCardView> {
     }
 
     return Wallpaper(
-      text: catText, // <-- Cambiado de displayedText a text
+      text: catText,
       onTap: _nextDialogue,
-      groundHeightFactor: 0.22, // Reducimos el suelo para no invadir el juego
-      catHeight: 140, // Tamaño compacto para el michi
-      bubbleHeight: 80, // Tamaño fijo para la viñeta
+      groundHeightFactor: 0.22,
+      catHeight: 140,
+      bubbleHeight: 160,
       child: Stack(
         children: [
           Column(
@@ -177,11 +176,9 @@ class _MemoryCardViewState extends State<MemoryCardView> {
               const SizedBox(height: 10),
               Expanded(
                 child: Center(
-                  child: SingleChildScrollView(
-                    child: MemoryCardGrid(
-                      cards: _state.cards,
-                      onCardTap: _onCardTap,
-                    ),
+                  child: MemoryCardGrid(
+                    cards: _state.cards,
+                    onCardTap: _onCardTap,
                   ),
                 ),
               ),

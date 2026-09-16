@@ -1,6 +1,7 @@
 // lib/features/hangman/presentation/views/hangman_view.dart
 
 import 'package:flutter/material.dart';
+import 'package:frontend/core/widgets/neo_nav_buttons.dart';
 
 import '../../../../core/constants/cat_dialogues.dart';
 import '../../../../core/widgets/wallpaper.dart';
@@ -55,21 +56,18 @@ class _HangmanViewState extends State<HangmanView> {
     }
 
     return Wallpaper(
-      text: currentText, // <-- Cambiado de displayedText a text
+      text: currentText,
+      groundHeightFactor: 0.12,
+      catHeight: 150,
+      bubbleHeight: 80,
       onTap: _nextDialogue,
       child: Column(
         children: [
+          // 1. Header (Atrás, Título, Reiniciar)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: Colors.black,
-                  size: 28,
-                ),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
+              const NeoBackButton(),
               const Text(
                 'AHORCADO',
                 style: TextStyle(
@@ -85,33 +83,47 @@ class _HangmanViewState extends State<HangmanView> {
             ],
           ),
 
+          // 2. Todo el contenido del juego empaquetado y desplazable verticalmente
           Expanded(
             child: Center(
-              child: HangmanAvatar(isGameOver: _gameState.isGameOver),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    HangmanAvatar(isGameOver: _gameState.isGameOver),
+                    const SizedBox(height: 12),
+                    Text(
+                      'INTENTOS RESTANTES: ${_gameState.maxTries - _gameState.wrongGuesses}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    WordDisplay(
+                      word: _gameState.secretWord,
+                      guessedLetters: _gameState.guessedLetters,
+                    ),
+                    const SizedBox(height: 16),
+                    if (_gameState.isGameOver || _gameState.isWon)
+                      ElevatedButton(
+                        onPressed: _startNewGame,
+                        child: const Text('REINTENTAR'),
+                      )
+                    else
+                      KeyboardGrid(
+                        guessedLetters: _gameState.guessedLetters,
+                        secretWord: _gameState.secretWord,
+                        onLetterPressed: _handleGuess,
+                      ),
+                  ],
+                ),
+              ),
             ),
           ),
 
-          Text(
-            'INTENTOS RESTANTES: ${_gameState.maxTries - _gameState.wrongGuesses}',
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-          ),
-          const SizedBox(height: 12),
-          WordDisplay(
-            word: _gameState.secretWord,
-            guessedLetters: _gameState.guessedLetters,
-          ),
-          const SizedBox(height: 16),
-          if (_gameState.isGameOver || _gameState.isWon)
-            ElevatedButton(
-              onPressed: _startNewGame,
-              child: const Text('REINTENTAR'),
-            )
-          else
-            KeyboardGrid(
-              guessedLetters: _gameState.guessedLetters,
-              secretWord: _gameState.secretWord,
-              onLetterPressed: _handleGuess,
-            ),
+          // 3. Espacio reservado para que descansen el gato y la viñeta abajo
+          const SizedBox(height: 140),
         ],
       ),
     );

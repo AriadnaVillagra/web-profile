@@ -36,13 +36,11 @@ class _ArcadeHubViewState extends State<ArcadeHubView> {
   @override
   Widget build(BuildContext context) {
     return Wallpaper(
-      text: _dialogues[_dialogueIndex], // <-- Cambiado de displayedText a text
+      text: _dialogues[_dialogueIndex],
       onTap: _nextDialogue,
-      // Variables opcionales para evitar superposiciones en el Hub:
-      groundHeightFactor:
-          0.22, // Achicamos un poco el suelo para dar más espacio a las cards
-      catHeight: 150, // Michi más compacto
-      bubbleHeight: 80, // Viñeta compacta
+      groundHeightFactor: 0.12,
+      catHeight: 150,
+      bubbleHeight: 80,
       child: Center(
         child: SingleChildScrollView(
           child: Wrap(

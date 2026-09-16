@@ -8,16 +8,11 @@ class Wallpaper extends StatefulWidget {
   final String text;
   final VoidCallback? onTap;
 
-  // Variables para personalizar por pantalla
   final bool showCatAndBubble;
-  final double
-  groundHeightFactor; // Porcentaje de pantalla para el suelo (ej: 0.25)
+  final double groundHeightFactor;
   final double? catHeight;
   final double? bubbleWidth;
   final double? bubbleHeight;
-  final double? bubbleBottom;
-  final double? bubbleRight;
-  final double? bubbleLeft;
   final EdgeInsetsGeometry contentPadding;
 
   const Wallpaper({
@@ -30,9 +25,6 @@ class Wallpaper extends StatefulWidget {
     this.catHeight,
     this.bubbleWidth,
     this.bubbleHeight = 90.0,
-    this.bubbleBottom,
-    this.bubbleRight,
-    this.bubbleLeft,
     this.contentPadding = const EdgeInsets.all(16.0),
   });
 
@@ -90,14 +82,12 @@ class _WallpaperState extends State<Wallpaper> {
   }
 
   void _handleTap() {
-    // Si la animación aún no termina, completa el texto inmediatamente
     if (_displayedText.length < widget.text.length) {
       _typewriterTimer?.cancel();
       setState(() {
         _displayedText = widget.text;
       });
     } else {
-      // Si ya terminó, ejecuta el callback externo
       widget.onTap?.call();
     }
   }
@@ -113,15 +103,34 @@ class _WallpaperState extends State<Wallpaper> {
           final isMobile = width < 600;
 
           final groundHeight = height * widget.groundHeightFactor;
+
           final defaultCatHeight = isMobile
-              ? (height * 0.20).clamp(130.0, 180.0)
+              ? (height * 0.22).clamp(130.0, 180.0)
               : (height * 0.28).clamp(170.0, 240.0);
           final finalCatHeight = widget.catHeight ?? defaultCatHeight;
 
           final defaultBubbleWidth = isMobile
-              ? (width - 40).clamp(240.0, 360.0)
-              : (width * 0.35).clamp(250.0, 350.0);
+              ? (width - 40).clamp(220.0, 360.0)
+              : (width * 0.35).clamp(100.0, 250.0);
           final finalBubbleWidth = widget.bubbleWidth ?? defaultBubbleWidth;
+
+          // Cálculo responsivo de posiciones
+          final catBottom = groundHeight - (finalCatHeight * 0.20);
+          final catRight = isMobile
+              ? (width / 2) - (finalCatHeight / 2)
+              : width * 0.08;
+
+          final bubbleBottom = isMobile
+              ? groundHeight + finalCatHeight * 0.80
+              : groundHeight + (finalCatHeight * 0.55);
+
+          final double? bubbleLeft = isMobile
+              ? (width - finalBubbleWidth) / 2
+              : null;
+
+          final double? bubbleRight = isMobile
+              ? null
+              : catRight + (finalCatHeight * 0.90);
 
           return GestureDetector(
             behavior: HitTestBehavior.opaque,
@@ -144,7 +153,7 @@ class _WallpaperState extends State<Wallpaper> {
                   ),
                 ),
 
-                // 2. Contenido Principal de la Pantalla (Juego, Hub, etc.)
+                // 2. Contenido de la Pantalla
                 Positioned.fill(
                   bottom: groundHeight,
                   child: Padding(
@@ -153,13 +162,11 @@ class _WallpaperState extends State<Wallpaper> {
                   ),
                 ),
 
-                // 3. Gato (Opcional)
+                // 3. Gato
                 if (widget.showCatAndBubble)
                   Positioned(
-                    bottom: groundHeight - 15,
-                    right: isMobile
-                        ? (width / 2) - (finalCatHeight / 2)
-                        : width * 0.08,
+                    bottom: catBottom,
+                    right: catRight,
                     child: Image.asset(
                       'assets/images/grumpy_cat.png',
                       height: finalCatHeight,
@@ -167,22 +174,12 @@ class _WallpaperState extends State<Wallpaper> {
                     ),
                   ),
 
-                // 4. Viñeta de Diálogo de Tamaño Fijo (Solo cambia el texto dentro)
+                // 4. Viñeta Adaptativa
                 if (widget.showCatAndBubble && widget.text.isNotEmpty)
                   Positioned(
-                    bottom:
-                        widget.bubbleBottom ??
-                        (isMobile
-                            ? groundHeight + finalCatHeight + 10
-                            : groundHeight + (finalCatHeight * 0.30)),
-                    left:
-                        widget.bubbleLeft ??
-                        (isMobile ? (width - finalBubbleWidth) / 2 : null),
-                    right:
-                        widget.bubbleRight ??
-                        (isMobile
-                            ? null
-                            : width * 0.08 + (finalCatHeight * 0.65)),
+                    bottom: bubbleBottom,
+                    left: bubbleLeft,
+                    right: bubbleRight,
                     child: SizedBox(
                       width: finalBubbleWidth,
                       height: widget.bubbleHeight,
