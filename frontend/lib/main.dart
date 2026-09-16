@@ -1,27 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/features/cat_intro/presentation/views/cat_intro_view.dart';
 
-import 'features/projects/presentation/widgets/projects_list_widget.dart';
+import 'core/theme/neobrutalism_theme.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const MyPortfolioApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyPortfolioApp extends StatelessWidget {
+  const MyPortfolioApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Web Profile Portfolio',
+      title: 'Portafolio Web',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(colorSchemeSeed: Colors.deepPurple, useMaterial3: true),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Mi Portafolio - Clean Architecture'),
-          elevation: 2,
-        ),
-        body: const ProjectsListWidget(),
+      theme: ThemeData(
+        scaffoldBackgroundColor: NeoColors.background,
+        useMaterial3: true,
       ),
+      home: const CatIntroView(),
     );
   }
 }
