@@ -60,7 +60,7 @@ class KeyboardGrid extends StatelessWidget {
         }
 
         return Focus(
-          canRequestFocus: false, // <-- Impide que la tecla robe el foco
+          canRequestFocus: false,
           child: GestureDetector(
             onTap: isPressed ? null : () => onLetterPressed(letter),
             child: AnimatedContainer(

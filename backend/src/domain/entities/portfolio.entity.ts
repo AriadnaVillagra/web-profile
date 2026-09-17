@@ -7,6 +7,7 @@ export interface Portfolio {
   deviceFrameUrl?: string;   // Para el PNG de la carcasa del celular
   deviceType?: 'mobile' | 'desktop' | 'none'; // Define si se renderiza dentro del celular
   liveUrl?: string;
+  liveUrlLabel?: string;
   githubUrl?: string;
   featured?: boolean;
 }

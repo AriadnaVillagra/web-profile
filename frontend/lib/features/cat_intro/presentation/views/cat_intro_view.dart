@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/constants/cat_dialogues.dart';
 import 'package:frontend/core/widgets/wallpaper.dart';
-
 import 'package:frontend/features/arcade/presentation/views/arcade_hub_view.dart';
 
 class CatIntroView extends StatefulWidget {
@@ -40,7 +39,9 @@ class _CatIntroViewState extends State<CatIntroView> {
     return Wallpaper(
       text: _dialogues[_currentIndex],
       onTap: _onTap,
-      child: const SizedBox.shrink(), // No hay widget adicional en la vista de intro
+      catHeight: 180,
+      bubbleHeight: 100,
+      child: const SizedBox.shrink(),
     );
   }
 }

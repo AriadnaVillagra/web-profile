@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/core/helpers/url_helper.dart';
 
 import '../../../../core/theme/neobrutalism_theme.dart';
 import '../../../../core/widgets/widgets.dart';
@@ -140,12 +141,15 @@ class _PortfolioListWidgetState extends State<PortfolioListWidget> {
                                 project.liveUrl!.isNotEmpty) ...[
                               NeoButton(
                                 backgroundColor: NeoColors.secondary,
-                                onPressed: () {
-                                  // TODO: Abrir enlace liveUrl
-                                },
-                                child: const Text(
-                                  'Ver Demo Live',
-                                  style: TextStyle(
+                                onPressed: () => UrlHelper.launchExternalUrl(
+                                  project.liveUrl!,
+                                ),
+                                child: Text(
+                                  (project.liveUrlLabel != null &&
+                                          project.liveUrlLabel!.isNotEmpty)
+                                      ? project.liveUrlLabel!
+                                      : 'Ver Demo Live',
+                                  style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: NeoColors.border,
                                   ),

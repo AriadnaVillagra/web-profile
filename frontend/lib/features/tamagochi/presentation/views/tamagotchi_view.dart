@@ -25,24 +25,52 @@ class _TamagotchiViewState extends State<TamagotchiView>
 
   late List<String> _dialogues;
   int _dialogueIndex = 0;
+  bool _hasNavigated = false;
 
   @override
   void initState() {
     super.initState();
+    _resetGameState();
+
     _lottieController = AnimationController(vsync: this);
     _dialogues = CatDialogues.getDialoguesFor(GameType.tamagotchi);
     _cat.addListener(_onStateChange);
   }
 
+  void _resetGameState() {
+    _hasNavigated = false;
+    PortfolioAccessService().lockPortfolio();
+    _cat.resetGame(); // Restablece barras, timer y mensajes internos del controlador
+  }
+
   void _onStateChange() {
+    if (!mounted) return;
+
+    // Si ya navegamos, ignoramos actualizaciones de estado secundarias
+    if (_hasNavigated) return;
+
     setState(() {});
 
     if (PortfolioAccessService().isUnlocked) {
-      Future.delayed(const Duration(milliseconds: 1800), () {
+      _hasNavigated = true;
+
+      // Pausamos/removemos el listener temporalmente para no capturar
+      // más updates durante la transición
+      _cat.removeListener(_onStateChange);
+
+      Future.delayed(const Duration(milliseconds: 1800), () async {
         if (!mounted) return;
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const PortfolioView()),
-        );
+
+        // Abrimos Portfolio y esperamos a que el usuario presione volver
+        await Navigator.of(context)
+            .push(MaterialPageRoute(builder: (_) => const PortfolioView()));
+
+        // AL VOLVER DEL PORTFOLIO:
+        if (mounted) {
+          _resetGameState();
+          _cat.addListener(_onStateChange); // Reactivamos el listener
+          setState(() {}); // Redibujamos la pantalla limpia
+        }
       });
     }
   }
@@ -69,6 +97,12 @@ class _TamagotchiViewState extends State<TamagotchiView>
     }
   }
 
+  void _restart() {
+    setState(() {
+      _resetGameState();
+    });
+  }
+
   @override
   void dispose() {
     _lottieController.dispose();
@@ -79,7 +113,8 @@ class _TamagotchiViewState extends State<TamagotchiView>
 
   @override
   Widget build(BuildContext context) {
-    final bool isGameWon = PortfolioAccessService().isUnlocked;
+    // Es victoria únicamente durante el delay previo a la navegación activa
+    final bool isGameWon = _hasNavigated && PortfolioAccessService().isUnlocked;
     final bool isGameOver = _cat.isGameOver;
 
     String catText = _dialogues[_dialogueIndex];
@@ -90,11 +125,12 @@ class _TamagotchiViewState extends State<TamagotchiView>
     }
 
     return Wallpaper(
-      text: catText, // <-- Cambiado de displayedText a text
+      text: catText,
       onTap: _nextDialogue,
-      groundHeightFactor: 0.20, // Suelo reducido para mayor espacio vertical
-      catHeight: 130, // Tamaño compacto para el gato
-      bubbleHeight: 75, // Altura fija de viñeta
+      groundHeightFactor: 0.20,
+      showCat: true,
+      showBubble: true,
+      renderBubbleInGround: true,
       child: Stack(
         children: [
           // Header Superior con Botón de Retroceso
@@ -262,7 +298,7 @@ class _TamagotchiViewState extends State<TamagotchiView>
             ),
           ),
 
-          // Overlay de Game Over cuando expira el Timer de 30s
+          // Overlay de Game Over
           if (isGameOver)
             Positioned.fill(
               child: Container(
@@ -302,7 +338,7 @@ class _TamagotchiViewState extends State<TamagotchiView>
                         ),
                         const SizedBox(height: 20),
                         ElevatedButton(
-                          onPressed: _cat.resetGame,
+                          onPressed: _restart,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: NeoColors.cardBg,
                             foregroundColor: NeoColors.border,

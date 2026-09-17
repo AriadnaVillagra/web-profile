@@ -43,6 +43,13 @@ class _MemoryCardViewState extends State<MemoryCardView> {
     });
   }
 
+  void _navigateToPortfolio() {
+    if (!mounted) return;
+    Navigator.of(
+      context,
+    ).pushReplacement(MaterialPageRoute(builder: (_) => const PortfolioView()));
+  }
+
   void _onCardTap(int index) async {
     final card = _state.cards[index];
 
@@ -96,13 +103,10 @@ class _MemoryCardViewState extends State<MemoryCardView> {
         );
       });
 
-      // Evaluar victoria
+      // Evaluar victoria y redirigir
       if (_state.checkWinCondition()) {
         Future.delayed(const Duration(milliseconds: 1800), () {
-          if (!mounted) return;
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const PortfolioView()),
-          );
+          _navigateToPortfolio();
         });
       }
     } else {
@@ -135,11 +139,14 @@ class _MemoryCardViewState extends State<MemoryCardView> {
     }
 
     return Wallpaper(
-      text: catText, // <-- Cambiado de displayedText a text
+      text: catText,
       onTap: _nextDialogue,
-      groundHeightFactor: 0.22, // Reducimos el suelo para no invadir el juego
-      catHeight: 140, // Tamaño compacto para el michi
-      bubbleHeight: 80, // Tamaño fijo para la viñeta
+      groundHeightFactor: 0.20,
+      catHeight: 150,
+      bubbleHeight: 90,
+      bubbleWidth: 90,
+      catLeft: 365,
+      renderBubbleInGround: true,
       child: Stack(
         children: [
           Column(
@@ -177,11 +184,9 @@ class _MemoryCardViewState extends State<MemoryCardView> {
               const SizedBox(height: 10),
               Expanded(
                 child: Center(
-                  child: SingleChildScrollView(
-                    child: MemoryCardGrid(
-                      cards: _state.cards,
-                      onCardTap: _onCardTap,
-                    ),
+                  child: MemoryCardGrid(
+                    cards: _state.cards,
+                    onCardTap: _onCardTap,
                   ),
                 ),
               ),
@@ -237,22 +242,25 @@ class _MemoryCardViewState extends State<MemoryCardView> {
                             ),
                           ),
                           const SizedBox(height: 20),
-                          if (isGameOver)
-                            ElevatedButton(
-                              onPressed: _startNewGame,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: NeoColors.cardBg,
-                                foregroundColor: NeoColors.border,
-                                side: const BorderSide(
-                                  width: 3,
-                                  color: NeoColors.border,
-                                ),
-                              ),
-                              child: const Text(
-                                'REINTENTAR',
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                          ElevatedButton(
+                            onPressed: isWon
+                                ? _navigateToPortfolio
+                                : _startNewGame,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: NeoColors.cardBg,
+                              foregroundColor: NeoColors.border,
+                              side: const BorderSide(
+                                width: 3,
+                                color: NeoColors.border,
                               ),
                             ),
+                            child: Text(
+                              'REINTENTAR',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),

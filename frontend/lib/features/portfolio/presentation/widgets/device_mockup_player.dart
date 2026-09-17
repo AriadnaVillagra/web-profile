@@ -43,22 +43,22 @@ class _DeviceMockupPlayerState extends State<DeviceMockupPlayer> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      // 📐 1. TAMAÑO GENERAL DEL MARCO DEL CELULAR
-      height: 420,
-      width: 210,
+      height: 520,
+      width: 260,
+
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // 🎬 2. VIDEO (Al fondo)
           if (_isInitialized)
-            // FractionallySizedBox escala el video dinámicamente sin recortarlo
-            FractionallySizedBox(
-              widthFactor: 2, // 💡 Cambia a 0.80 para achicar el video, o 0.95 para agrandarlo
-              heightFactor: 0.92, // 💡 Cambia a 0.85 para achicar el video, o 0.95 para agrandarlo
+            Positioned(
+              top: 14,
+              bottom: 14,
+              left: 13,
+              right: 13,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(18.0),
+                borderRadius: BorderRadius.circular(24.0),
                 child: FittedBox(
-                  fit: BoxFit.contain, // 👈 Importante: contiene el video completo sin recortar
+                  fit: BoxFit.cover,
                   child: SizedBox(
                     width: _controller.value.size.width,
                     height: _controller.value.size.height,
@@ -70,9 +70,10 @@ class _DeviceMockupPlayerState extends State<DeviceMockupPlayer> {
           else
             const Center(child: CircularProgressIndicator()),
 
-          // 📱 3. MARCO DEL CELULAR (Por encima)
-          IgnorePointer(
-            child: Image.asset('images/mobile_frame.png', fit: BoxFit.contain),
+          Positioned.fill(
+            child: IgnorePointer(
+              child: Image.asset('images/mobile_frame.png', fit: BoxFit.fill),
+            ),
           ),
         ],
       ),

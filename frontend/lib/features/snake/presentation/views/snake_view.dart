@@ -63,7 +63,6 @@ class _SnakeViewState extends State<SnakeView> {
           _gameState = _gameState.update();
         });
 
-        // Al ganar se cancela el timer y redirige al portafolio
         if (_gameState.isWon) {
           _timer?.cancel();
           Future.delayed(const Duration(milliseconds: 1800), () {
@@ -123,7 +122,6 @@ class _SnakeViewState extends State<SnakeView> {
     final bool isWon = _gameState.isWon;
     final bool isGameOver = _gameState.isGameOver;
 
-    // Cambiar diálogos dinámicos según estado del minijuego
     String catText = _dialogues[_dialogueIndex];
     if (isWon) {
       catText =
@@ -137,12 +135,11 @@ class _SnakeViewState extends State<SnakeView> {
       autofocus: true,
       onKeyEvent: _handleKeyEvent,
       child: Wallpaper(
-        text: catText, // <-- Cambiado de displayedText a text
+        text: catText,
         onTap: _nextDialogue,
-        groundHeightFactor:
-            0.18, // Se reduce el suelo para dar espacio al tablero y controles
-        catHeight: 130, // Gato más compacto
-        bubbleHeight: 75, // Viñeta compacta
+        groundHeightFactor: 0.12,
+        catHeight: 150,
+        bubbleWidth: 250,
         child: Stack(
           children: [
             GestureDetector(
@@ -156,7 +153,7 @@ class _SnakeViewState extends State<SnakeView> {
               },
               child: Column(
                 children: [
-                  // Barra superior adaptada
+                  // 1. Barra superior
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -167,6 +164,7 @@ class _SnakeViewState extends State<SnakeView> {
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                           color: NeoColors.border,
+                          fontFamily: 'Courier',
                         ),
                       ),
                       IconButton(
@@ -178,24 +176,38 @@ class _SnakeViewState extends State<SnakeView> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
                   Text(
                     'PUNTAJE: ${_gameState.score} / ${_gameState.targetScore}',
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: NeoColors.border,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
+
+                  // 2. Tablero + Controles contenidos de forma flexible
                   Expanded(
-                    child: Center(child: SnakeBoard(gameState: _gameState)),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Center(
+                            child: SnakeBoard(gameState: _gameState),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        SnakeControls(
+                          onDirectionChanged: _changeDirection,
+                          activeDirection: _activeDirection,
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  SnakeControls(
-                    onDirectionChanged: _changeDirection,
-                    activeDirection: _activeDirection,
-                  ),
+
+                  // 3. Espacio reservado para el gato y la viñeta
+                  const SizedBox(height: 140),
                 ],
               ),
             ),
