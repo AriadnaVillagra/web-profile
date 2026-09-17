@@ -43,6 +43,13 @@ class _MemoryCardViewState extends State<MemoryCardView> {
     });
   }
 
+  void _navigateToPortfolio() {
+    if (!mounted) return;
+    Navigator.of(
+      context,
+    ).pushReplacement(MaterialPageRoute(builder: (_) => const PortfolioView()));
+  }
+
   void _onCardTap(int index) async {
     final card = _state.cards[index];
 
@@ -96,13 +103,10 @@ class _MemoryCardViewState extends State<MemoryCardView> {
         );
       });
 
-      // Evaluar victoria
+      // Evaluar victoria y redirigir
       if (_state.checkWinCondition()) {
         Future.delayed(const Duration(milliseconds: 1800), () {
-          if (!mounted) return;
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const PortfolioView()),
-          );
+          _navigateToPortfolio();
         });
       }
     } else {
@@ -125,6 +129,7 @@ class _MemoryCardViewState extends State<MemoryCardView> {
   Widget build(BuildContext context) {
     final bool isWon = _state.isWon;
     final bool isGameOver = _state.isGameOver;
+
     // Cambiar dinámicamente el mensaje del gato según el estado del juego
     String catText = _dialogues[_dialogueIndex];
     if (isWon) {
@@ -136,9 +141,12 @@ class _MemoryCardViewState extends State<MemoryCardView> {
     return Wallpaper(
       text: catText,
       onTap: _nextDialogue,
-      groundHeightFactor: 0.22,
-      catHeight: 140,
-      bubbleHeight: 160,
+      groundHeightFactor: 0.20,
+      catHeight: 150,
+      bubbleHeight: 90,
+      bubbleWidth: 90,
+      catLeft: 365,
+      renderBubbleInGround: true,
       child: Stack(
         children: [
           Column(
@@ -234,22 +242,25 @@ class _MemoryCardViewState extends State<MemoryCardView> {
                             ),
                           ),
                           const SizedBox(height: 20),
-                          if (isGameOver)
-                            ElevatedButton(
-                              onPressed: _startNewGame,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: NeoColors.cardBg,
-                                foregroundColor: NeoColors.border,
-                                side: const BorderSide(
-                                  width: 3,
-                                  color: NeoColors.border,
-                                ),
-                              ),
-                              child: const Text(
-                                'REINTENTAR',
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                          ElevatedButton(
+                            onPressed: isWon
+                                ? _navigateToPortfolio
+                                : _startNewGame,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: NeoColors.cardBg,
+                              foregroundColor: NeoColors.border,
+                              side: const BorderSide(
+                                width: 3,
+                                color: NeoColors.border,
                               ),
                             ),
+                            child: Text(
+                              'REINTENTAR',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),

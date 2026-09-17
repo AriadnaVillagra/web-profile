@@ -139,7 +139,7 @@ class _SnakeViewState extends State<SnakeView> {
         onTap: _nextDialogue,
         groundHeightFactor: 0.12,
         catHeight: 150,
-        bubbleHeight: 80,
+        bubbleWidth: 250,
         child: Stack(
           children: [
             GestureDetector(

@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:frontend/features/memory_cards/presentation/views/memory_card_view.dart';
+import 'package:frontend/features/portfolio/presentation/views/portfolio_view.dart';
 import 'package:frontend/features/snake/presentation/views/snake_view.dart';
 import 'package:frontend/features/tamagochi/presentation/views/tamagotchi_view.dart';
 
@@ -41,52 +42,77 @@ class _ArcadeHubViewState extends State<ArcadeHubView> {
       groundHeightFactor: 0.12,
       catHeight: 150,
       bubbleHeight: 80,
-      child: Center(
-        child: SingleChildScrollView(
-          child: Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            alignment: WrapAlignment.center,
-            children: [
-              GameCard(
-                title: 'Ahorcado',
-                lottieAsset: 'assets/animations/plankton_evol.json',
-                onPlay: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const HangmanView()),
-                  );
-                },
+      child: Stack(
+        children: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const PortfolioView()));
+            },
+            child: Align(
+              alignment: Alignment.topRight,
+              child: const Text(
+                'SKIP',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
-              GameCard(
-                title: 'Snake',
-                lottieAsset: 'assets/animations/plankton_evol.json',
-                onPlay: () {
-                  Navigator.of(
-                    context,
-                  ).push(MaterialPageRoute(builder: (_) => const SnakeView()));
-                },
-              ),
-              GameCard(
-                title: 'Memory',
-                lottieAsset: 'assets/animations/plankton_evol.json',
-                onPlay: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const MemoryCardView()),
-                  );
-                },
-              ),
-              GameCard(
-                title: 'Tamagotchi',
-                lottieAsset: 'assets/animations/plankton_evol.json',
-                onPlay: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const TamagotchiView()),
-                  );
-                },
-              ),
-            ],
+            ),
           ),
-        ),
+          Center(
+            child: SingleChildScrollView(
+              child: Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                alignment: WrapAlignment.center,
+                children: [
+                  GameCard(
+                    title: 'Ahorcado',
+                    lottieAsset: 'assets/animations/plankton_evol.json',
+                    onPlay: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const HangmanView()),
+                      );
+                    },
+                  ),
+                  GameCard(
+                    title: 'Snake',
+                    lottieAsset: 'assets/animations/plankton_evol.json',
+                    onPlay: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const SnakeView()),
+                      );
+                    },
+                  ),
+                  GameCard(
+                    title: 'Memory',
+                    lottieAsset: 'assets/animations/plankton_evol.json',
+                    onPlay: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const MemoryCardView(),
+                        ),
+                      );
+                    },
+                  ),
+                  GameCard(
+                    title: 'Tamagotchi',
+                    lottieAsset: 'assets/animations/plankton_evol.json',
+                    onPlay: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const TamagotchiView(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

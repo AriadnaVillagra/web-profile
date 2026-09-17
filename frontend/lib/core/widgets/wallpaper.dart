@@ -8,11 +8,18 @@ class Wallpaper extends StatefulWidget {
   final String text;
   final VoidCallback? onTap;
 
-  final bool showCatAndBubble;
+  // Modificadores individuales
+  final bool showCat;
+  final bool showBubble;
+  final bool renderBubbleInGround; // Opción para mover el texto/viñeta al pasto
+
   final double groundHeightFactor;
   final double? catHeight;
   final double? bubbleWidth;
   final double? bubbleHeight;
+  final double? catbottom;
+  final double? catRight;
+  final double? catLeft;
   final EdgeInsetsGeometry contentPadding;
 
   const Wallpaper({
@@ -20,12 +27,17 @@ class Wallpaper extends StatefulWidget {
     required this.child,
     this.text = '',
     this.onTap,
-    this.showCatAndBubble = true,
+    this.showCat = true,
+    this.showBubble = true,
+    this.renderBubbleInGround = false,
     this.groundHeightFactor = 0.28,
     this.catHeight,
     this.bubbleWidth,
     this.bubbleHeight = 90.0,
     this.contentPadding = const EdgeInsets.all(16.0),
+    this.catbottom,
+    this.catRight,
+    this.catLeft,
   });
 
   @override
@@ -114,23 +126,26 @@ class _WallpaperState extends State<Wallpaper> {
               : (width * 0.35).clamp(100.0, 250.0);
           final finalBubbleWidth = widget.bubbleWidth ?? defaultBubbleWidth;
 
-          // Cálculo responsivo de posiciones
-          final catBottom = groundHeight - (finalCatHeight * 0.20);
-          final catRight = isMobile
-              ? (width / 2) - (finalCatHeight / 2)
-              : width * 0.08;
+          // Posiciones
+          final catBottom =
+              widget.catbottom ?? (groundHeight - (finalCatHeight * 0.20));
+          final catRight = widget.catRight ?? (isMobile ? null : width * 0.08);
+          final catLeft = widget.catLeft ?? (isMobile ? 255.5 : null);
 
-          final bubbleBottom = isMobile
-              ? groundHeight + finalCatHeight * 0.80
-              : groundHeight + (finalCatHeight * 0.55);
+          // Posicionamiento alternativo para renderizar la viñeta dentro del pasto
+          final bubbleBottom = widget.renderBubbleInGround
+              ? 12.0 // Ubicación centrada en el pasto
+              : (isMobile
+                    ? groundHeight + finalCatHeight * 0.80
+                    : groundHeight + (finalCatHeight * 0.55));
 
-          final double? bubbleLeft = isMobile
-              ? (width - finalBubbleWidth) / 2
-              : null;
+          final double? bubbleLeft = widget.renderBubbleInGround
+              ? (isMobile ? 16.0 : 24.0)
+              : (isMobile ? (width - finalBubbleWidth) * 0.8 : null);
 
-          final double? bubbleRight = isMobile
-              ? null
-              : catRight + (finalCatHeight * 0.90);
+          final double? bubbleRight = widget.renderBubbleInGround
+              ? (widget.showCat ? (width - (catLeft ?? 255.5) + 12) : 16.0)
+              : (isMobile ? null : catRight! + (finalCatHeight * 0.9));
 
           return GestureDetector(
             behavior: HitTestBehavior.opaque,
@@ -162,11 +177,12 @@ class _WallpaperState extends State<Wallpaper> {
                   ),
                 ),
 
-                // 3. Gato
-                if (widget.showCatAndBubble)
+                // 3. Gato Independiente
+                if (widget.showCat)
                   Positioned(
                     bottom: catBottom,
                     right: catRight,
+                    left: catLeft,
                     child: Image.asset(
                       'assets/images/grumpy_cat.png',
                       height: finalCatHeight,
@@ -174,26 +190,39 @@ class _WallpaperState extends State<Wallpaper> {
                     ),
                   ),
 
-                // 4. Viñeta Adaptativa
-                if (widget.showCatAndBubble && widget.text.isNotEmpty)
+                // 4. Viñeta Independiente
+                if (widget.showBubble && widget.text.isNotEmpty)
                   Positioned(
                     bottom: bubbleBottom,
                     left: bubbleLeft,
                     right: bubbleRight,
                     child: SizedBox(
-                      width: finalBubbleWidth,
-                      height: widget.bubbleHeight,
+                      width: widget.renderBubbleInGround
+                          ? null
+                          : finalBubbleWidth,
+                      height: widget.renderBubbleInGround
+                          ? (groundHeight - 24.0)
+                          : widget.bubbleHeight,
                       child: CustomPaint(
-                        painter: SpeechBubblePainter(isBottomTail: isMobile),
+                        painter: SpeechBubblePainter(
+                          isBottomTail:
+                              isMobile && !widget.renderBubbleInGround,
+                          hideTail: widget.renderBubbleInGround,
+                        ),
                         child: Container(
-                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 22),
+                          padding: widget.renderBubbleInGround
+                              ? const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 8,
+                                )
+                              : const EdgeInsets.fromLTRB(16, 12, 16, 22),
                           alignment: Alignment.center,
                           child: SingleChildScrollView(
                             physics: const NeverScrollableScrollPhysics(),
                             child: Text(
                               _displayedText,
                               style: TextStyle(
-                                fontSize: isMobile ? 14 : 16,
+                                fontSize: isMobile ? 13 : 15,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                                 fontFamily: 'Courier',
@@ -216,12 +245,13 @@ class _WallpaperState extends State<Wallpaper> {
 
 class SpeechBubblePainter extends CustomPainter {
   final bool isBottomTail;
+  final bool hideTail;
 
-  SpeechBubblePainter({this.isBottomTail = false});
+  SpeechBubblePainter({this.isBottomTail = false, this.hideTail = false});
 
   @override
   void paint(Canvas canvas, Size size) {
-    const double radius = 20.0;
+    const double radius = 16.0;
     const double tailWidth = 18.0;
     const double tailHeight = 16.0;
 
@@ -238,14 +268,16 @@ class SpeechBubblePainter extends CustomPainter {
         size.height,
       );
 
-      if (isBottomTail) {
-        path.lineTo((size.width / 2) + (tailWidth / 2), size.height);
-        path.lineTo(size.width / 2, size.height + tailHeight);
-        path.lineTo((size.width / 2) - (tailWidth / 2), size.height);
-      } else {
-        path.lineTo(size.width - 30, size.height);
-        path.lineTo(size.width - 10, size.height + tailHeight);
-        path.lineTo(size.width - 30 - tailWidth, size.height);
+      if (!hideTail) {
+        if (isBottomTail) {
+          path.lineTo((size.width / 2) + (tailWidth / 2), size.height);
+          path.lineTo(size.width / 2, size.height + tailHeight);
+          path.lineTo((size.width / 2) - (tailWidth / 2), size.height);
+        } else {
+          path.lineTo(size.width - 30, size.height);
+          path.lineTo(size.width - 10, size.height + tailHeight);
+          path.lineTo(size.width - 30 - tailWidth, size.height);
+        }
       }
 
       path.lineTo(radius, size.height);

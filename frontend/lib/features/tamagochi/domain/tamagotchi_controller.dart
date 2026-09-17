@@ -61,14 +61,27 @@ class TamagotchiController extends ChangeNotifier implements GameRule {
         // Si el jugador no interactúa, sus métricas decaen gradualmente
         hunger = (hunger - 0.02).clamp(0.0, 1.0);
         happiness = (happiness - 0.02).clamp(0.0, 1.0);
+
+        // Verificamos si alguna barra llegó a 0 inmediatamente
+        _checkGameOver();
         notifyListeners();
       } else {
         // Se acabó el tiempo -> DERROTA
-        _isGameOver = true;
-        timer.cancel();
-        notifyListeners();
+        _triggerGameOver();
       }
     });
+  }
+
+  void _checkGameOver() {
+    if (hunger <= 0.0 || happiness <= 0.0) {
+      _triggerGameOver();
+    }
+  }
+
+  void _triggerGameOver() {
+    _isGameOver = true;
+    _timer?.cancel();
+    notifyListeners();
   }
 
   void feed() {

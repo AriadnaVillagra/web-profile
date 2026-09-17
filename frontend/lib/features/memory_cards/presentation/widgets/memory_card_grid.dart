@@ -17,13 +17,13 @@ class MemoryCardGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 350),
+        constraints: const BoxConstraints(maxWidth: 400),
         child: GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: cards.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
+            crossAxisCount: 4,
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
             childAspectRatio: 0.85,
